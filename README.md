@@ -1,4 +1,4 @@
-# PHPLegends\Timespan Library
+# WallaceMaxters\Timespan Library
 
 This is a library to work only with time durations in PHP.
 
@@ -6,7 +6,7 @@ With it you can work with the time very simply:
 
 
 ```php
-use PHPLegends\Timespan\Timespan;
+use WallaceMaxters\Timespan\Timespan;
 
 $time = new Timespan(0, 0, 10);
 
