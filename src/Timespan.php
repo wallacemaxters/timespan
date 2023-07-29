@@ -1,46 +1,30 @@
 <?php
 
-namespace PHPLegends\Timespan;
+namespace WallaceMaxters\Timespan;
 
 use DateTimeInterface;
 use JsonSerializable;
+use Stringable;
 
 /**
  * The Timespan class
  *
  * @author Wallace de Souza Vizerra <wallacemaxters@gmail.com>
  * */
-class Timespan implements JsonSerializable
+
+class Timespan implements JsonSerializable, Stringable
 {
     public const DEFAULT_FORMAT        = '%r%h:%i:%s';
     public const TIME_WITH_SIGN_FORMAT = '%R%h:%i:%s';
 
-    /**
-     * @var int
-     */
-    protected $seconds = 0;
+    public float $seconds;
 
-    /**
-     * Create Timespan
-     *
-     * @param integer $hours
-     * @param integer $minutes
-     * @param integer $seconds
-     */
-    public function __construct(int $hours = 0, int $minutes = 0, int $seconds = 0)
+    public function __construct(float $hours = 0, float $minutes = 0, float $seconds = 0)
     {
         $this->setTime($hours, $minutes, $seconds);
     }
 
-    /**
-     * Sets the time
-     *
-     * @param integer $hours
-     * @param integer $minutes
-     * @param integer $seconds
-     * @return self
-     */
-    public function setTime(int $hours = 0, int $minutes = 0, int $seconds = 0): self
+    public function setTime(float $hours = 0, float $minutes = 0, float $seconds = 0): static
     {
         return $this->setSeconds(
             ($hours * 3600) + (60 * $minutes) + $seconds
@@ -53,7 +37,7 @@ class Timespan implements JsonSerializable
      * @param integer $seconds
      * @return self
      */
-    public function setSeconds(int $seconds): self
+    public function setSeconds(float $seconds): static
     {
         $this->seconds = $seconds;
 
@@ -66,7 +50,7 @@ class Timespan implements JsonSerializable
      * @param integer $minutes
      * @return self
      */
-    public function setMinutes(int $minutes): self
+    public function setMinutes(float $minutes): static
     {
         return $this->setTime(0, $minutes, 0);
     }
@@ -77,7 +61,7 @@ class Timespan implements JsonSerializable
      * @param integer $hours
      * @return self
      */
-    public function setHours(int $hours): self
+    public function setHours(float $hours): static
     {
         return $this->setTime($hours, 0, 0);
     }
@@ -88,7 +72,7 @@ class Timespan implements JsonSerializable
      * @param integer $seconds
      * @return self
      */
-    public function addSeconds(int $seconds): self
+    public function addSeconds(float $seconds): static
     {
         return $this->setTime(0, 0, $this->seconds + $seconds);
     }
@@ -99,7 +83,7 @@ class Timespan implements JsonSerializable
      * @param integer $minutes
      * @return self
      */
-    public function addMinutes(int $minutes): self
+    public function addMinutes(float $minutes): static
     {
         return $this->setTime(0, $minutes, $this->seconds);
     }
@@ -110,56 +94,37 @@ class Timespan implements JsonSerializable
      * @param integer $hours
      * @return self
      */
-    public function addHours(int $hours): self
+    public function addHours(float $hours): static
     {
         return $this->setTime($hours, 0, $this->seconds);
     }
 
     /**
-     * Gets total seconds of time
-     *
-     * @return integer
-     */
-    public function getSeconds(): int
-    {
-        return $this->seconds;
-    }
-
-    /**
      * Gets the time as minutes
-     *
-     * @return float
      */
     public function asMinutes(): float
     {
-        return $this->getSeconds() / 60;
+        return $this->seconds / 60;
     }
 
     /**
      * Get as hours
-     *
-     * @return float
      */
     public function asHours(): float
     {
-        return $this->getSeconds() / 3600;
+        return $this->seconds / 3600;
     }
 
     /**
      * Turns the time into negative
-     *
-     * @return void
      */
     public function negative()
     {
-        return $this->setSeconds(-$this->getSeconds());
+        return $this->setSeconds(-$this->seconds);
     }
 
     /**
      * Gets a formatted time 
-     *
-     * @param string $format
-     * @return string
      */
     public function format(string $format = self::DEFAULT_FORMAT): string
     {
@@ -168,10 +133,8 @@ class Timespan implements JsonSerializable
 
     /**
      * Returns a string from the default Timespan format 
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->format();
     }
@@ -188,37 +151,24 @@ class Timespan implements JsonSerializable
 
     /**
      * Creates a new time based on diff with another Timespan
-     *
-     * @param self $time
-     * @param boolean $absolute
-     * @return self
      */
-    public function diff(self $time, bool $absolute = true): self
+    public function diff(self $time, bool $absolute = true): static
     {
-        $seconds = $time->getSeconds() - $this->getSeconds();
+        $seconds = $time->seconds - $this->seconds;
 
         return new static(0, 0, $absolute ? abs($seconds) : $seconds);
     }
 
     /**
      * Returns if the time is negative
-     *
-     * @return boolean
      */
     public function isNegative(): bool
     {
         return $this->seconds < 0;
     }
 
-    /**
-     * Sums time into timespan
-     *
-     * @param integer $hours
-     * @param integer $minutes
-     * @param integer $seconds
-     * @return self
-     */
-    public function add(int $hours = 0, int $minutes = 0, int $seconds = 0): self
+
+    public function add(float $hours = 0, float $minutes = 0, float $seconds = 0): static
     {
         return $this->addHours($hours)->addMinutes($minutes)->addSeconds($seconds);
     }
@@ -230,7 +180,7 @@ class Timespan implements JsonSerializable
      */
     public function getUnits(): array
     {
-        $seconds = abs($this->getSeconds());
+        $seconds = abs($this->seconds);
 
         $time['hours'] = floor($seconds / 3600);
 
@@ -245,60 +195,52 @@ class Timespan implements JsonSerializable
 
     /**
      * Checks if is a zero time
-     *
-     * @return boolean
      */
     public function isEmpty(): bool
     {
-        return $this->getSeconds() == 0;
+        return $this->seconds == 0;
     }
 
     /**
      * Add amount of time to Timespan from a strtotime string
-     *
-     * @param string $strtime
-     * @return self
      */
-    public function addFromString(string $strtime): self
+    public function addFromString(string $strtime): static
     {
         return $this->addSeconds(strtotime($strtime, 0));
     }
 
     /**
      * Creates a Timespan instance from a strtotime string
-     *
-     * @static
-     * @param string $strtime
-     * @return self
      */
-    public static function createFromString(string $strtime): self
+    public static function createFromString(string $strtime): static
     {
         return (new static)->addFromString($strtime);
     }
 
     /**
      * Create a Timespan from a specific format
-     *
-     * @param string $format
-     * @param string $value
-     * @return self
      */
-    public static function createFromFormat(string $format, string $value): self
+    public static function createFromFormat(string $format, string $value): static
     {
         return Parser::createTimespanFromFormat($format, $value);
     }
     
     /**
      * Creates Timespan from  a diff of DateTimes
-     *
-     * @param DateTimeInterface $date1
-     * @param DateTimeInterface $date2
-     * @return self
      */
-    public static function createFromDateDiff(DateTimeInterface $date1, DateTimeInterface $date2): self
+    public static function createFromDateDiff(DateTimeInterface $date1, DateTimeInterface $date2): static
     {
         $seconds = $date2->getTimestamp() - $date1->getTimestamp();
 
         return new static(0, 0, $seconds);
+    }
+
+    public function sum(self ...$timespans): static
+    {
+        foreach ($timespans as $timespan) {
+            $this->seconds += $timespan->seconds;
+        }
+
+        return $this;
     }
 }

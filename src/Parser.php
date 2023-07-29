@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPLegends\Timespan;
+namespace WallaceMaxters\Timespan;
 
 /**
  * @author Wallace de Souza Vizerra <wallacemaxters@gmail.com>

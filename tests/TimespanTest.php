@@ -1,18 +1,43 @@
 <?php
 
-use PHPLegends\Timespan\Timespan;
+use WallaceMaxters\Timespan\Timespan;
 use PHPUnit\Framework\TestCase;
+use WallaceMaxters\Timespan\Parser;
 
 class TimespanTest extends TestCase
 {
     public function testGetSeconds()
     {
-        $this->assertEquals(90, (new Timespan(0, 1, 30))->getSeconds());
-        $this->assertEquals(90, (new Timespan(0, 0, 90))->getSeconds());
-        $this->assertEquals(3600, (new Timespan(1, 0, 0))->getSeconds());
+        $this->assertEquals(90, (new Timespan(0, 1, 30))->seconds);
+        $this->assertEquals(90, (new Timespan(0, 0, 90))->seconds);
+        $this->assertEquals(3600, (new Timespan(1, 0, 0))->seconds);
 
-        $this->assertEquals(PHP_INT_MAX, (new Timespan(0, 0, PHP_INT_MAX))->getSeconds());
+        $this->assertEquals(PHP_INT_MAX, (new Timespan(0, 0, PHP_INT_MAX))->seconds);
+    }
 
+    public function testSetMinutes()
+    {
+        foreach ([
+            new Timespan(0, 1.5, 0),
+            (new Timespan)->setMinutes(1.5)
+        ] as $time) {
+
+    
+            $this->assertEquals('00:01:30', $time->format());
+    
+            $this->assertEqualsWithDelta(60 + 30, $time->seconds, 0.1);
+        }
+    }
+
+    public function testSetHours()
+    {
+        
+        foreach ([
+            new Timespan(1.5, 0, 0),
+            (new Timespan)->setHours(1.5)
+        ] as $time) {
+            $this->assertEquals('01:30:00', $time->format());
+        }
     }
 
     public function testAsMinutes()
@@ -67,17 +92,17 @@ class TimespanTest extends TestCase
     {
         $timespan = new Timespan();
 
-        $this->assertEquals(0, $timespan->getSeconds());
+        $this->assertEquals(0, $timespan->seconds);
 
-        $this->assertEquals(59, $timespan->add(0, 0, 59)->getSeconds());
+        $this->assertEquals(59, $timespan->add(0, 0, 59)->seconds);
 
-        $this->assertEquals(60 + 59, $timespan->add(0, 1)->getSeconds());
+        $this->assertEquals(60 + 59, $timespan->add(0, 1)->seconds);
 
-        $this->assertEquals(3600 + 60 + 59, $timespan->add(1)->getSeconds());
+        $this->assertEquals(3600 + 60 + 59, $timespan->add(1)->seconds);
 
         $timespan = new Timespan();
 
-        $this->assertEquals(-3600, $timespan->add(-1)->getSeconds());
+        $this->assertEquals(-3600, $timespan->add(-1)->seconds);
     }
 
     public function testSetTime()
@@ -86,7 +111,7 @@ class TimespanTest extends TestCase
 
         $timespan->setTime(1, 1, 1);
 
-        $this->assertEquals(3600 + 60 + 1, $timespan->getSeconds());
+        $this->assertEquals(3600 + 60 + 1, $timespan->seconds);
     }
 
     public function testIsEmpty()
@@ -109,14 +134,14 @@ class TimespanTest extends TestCase
 
         $this->assertInstanceOf(Timespan::class, $diff);
         $this->assertEquals('00:01:20', $diff->format());
-        $this->assertEquals(60 + 20, $diff->getSeconds());
+        $this->assertEquals(60 + 20, $diff->seconds);
 
 
         $diff = $t2->diff($t1, false);
 
         $this->assertTrue($diff->isNegative());
         $this->assertEquals('-00:01:20', $diff->format());
-        $this->assertEquals(-60 -20, $diff->getSeconds());
+        $this->assertEquals(-60 -20, $diff->seconds);
     }
 
 
@@ -124,11 +149,11 @@ class TimespanTest extends TestCase
     {
         $timespan = new TimeSpan(0, 1, 0);
 
-        $this->assertEquals(60, $timespan->getSeconds());
-        $this->assertEquals(60 + 30, $timespan->addFromString('+30 seconds')->getSeconds());
-        $this->assertEquals(60 + 30 + 60, $timespan->addFromString('+1 minutes')->getSeconds());
-        $this->assertEquals(60 + 30 + 60 + 3600, $timespan->addFromString('+1 hours')->getSeconds());
-        $this->assertEquals(60 + 30 + 60 + 3600 - 1800, $timespan->addFromString('-30 minutes')->getSeconds());
+        $this->assertEquals(60, $timespan->seconds);
+        $this->assertEquals(60 + 30, $timespan->addFromString('+30 seconds')->seconds);
+        $this->assertEquals(60 + 30 + 60, $timespan->addFromString('+1 minutes')->seconds);
+        $this->assertEquals(60 + 30 + 60 + 3600, $timespan->addFromString('+1 hours')->seconds);
+        $this->assertEquals(60 + 30 + 60 + 3600 - 1800, $timespan->addFromString('-30 minutes')->seconds);
     }
 
     public function testCreateFromString()
@@ -153,27 +178,34 @@ class TimespanTest extends TestCase
         ] as $expected => $args) {
             $this->assertEquals(
                 $expected,
-                Timespan::createFromFormat(...$args)->getSeconds()
+                Timespan::createFromFormat(...$args)->seconds
             );
+        }
+
+
+        try {
+            Timespan::createFromFormat('invalid', '00:00:04');
+        } catch (\Throwable $th) {
+            $this->assertInstanceOf(InvalidArgumentException::class, $th);
         }
     }
 
     public function testAddMinutes()
     {
         $timespan = new Timespan(0, 1, 30);
-        $this->assertEquals(90, $timespan->getSeconds());
+        $this->assertEquals(90, $timespan->seconds);
 
         $timespan->addMinutes(2);
-        $this->assertEquals(90 + 120, $timespan->getSeconds());
+        $this->assertEquals(90 + 120, $timespan->seconds);
     }
 
     public function testAddHours()
     {
         $timespan = new Timespan(0, 0, 30);
-        $this->assertEquals(30, $timespan->getSeconds());
+        $this->assertEquals(30, $timespan->seconds);
 
         $timespan->addHours(2);
-        $this->assertEquals(30 + 7200, $timespan->getSeconds());
+        $this->assertEquals(30 + 7200, $timespan->seconds);
     }
 
     public function testGetUnits()
@@ -187,6 +219,12 @@ class TimespanTest extends TestCase
         }
     }
 
+    public function testisValidFormat()
+    {
+        $this->assertFalse(Parser::isValidFormat('invalid', '00:00:00'));
+
+        $this->assertTrue(Parser::isValidFormat('%h:%i:%s', '00:00:00'));
+    }
 
     public function testCreateFromDateDiff()
     {
@@ -209,9 +247,39 @@ class TimespanTest extends TestCase
             new DateTime('2022-01-01 13:00:02')
         );
 
-        $this->assertEquals(31539602, $timespan->getSeconds());
+        $this->assertEquals(31539602, $timespan->seconds);
         $this->assertEquals('8761:00:02', $timespan->format('%h:%i:%s'));
+    }
+
+    public function testJsonSerialize()
+    {
+        $time = new Timespan(0, 1, 2);
+
+        $this->assertEquals('"00:01:02"', json_encode($time));
+    }
 
 
+    public function testToString()
+    {
+        $time = new Timespan(0, 1, 2);
+
+        $this->assertEquals('00:01:02', (string) $time);
+    }
+
+    public function testSum()
+    {
+        $arr = [
+            new Timespan(0, 0, 1),
+            new Timespan(0, 0, 2),
+            new Timespan(0, 0, 3)
+        ];
+
+        $timespan = (new Timespan(0, 0, 4))->sum(...$arr);
+
+        $this->assertEqualsWithDelta(
+            10,
+            $timespan->seconds, 
+            0.1
+        );
     }
 }

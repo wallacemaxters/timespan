@@ -1,18 +1,17 @@
 {
-    "name"     : "phplegends/timespan",
+    "name"     : "wallacemaxters/timespan",
     "description" : "A timespan library",
     "license" : "MIT",
     "autoload" : {
         "psr-4": {
-            "PHPLegends\\Timespan\\": "src/Timespan/"
+            "WallaceMaxters\\Timespan\\": "src/"
         }
     },
     "scripts" : {
         "test" : "./vendor/bin/phpunit",
-        "fix"  : "./vendor/bin/php-cs-fixer fix ."
+        "coverage": "export XDEBUG_MODE=coverage && vendor/bin/phpunit --coverage-html tests/reports"
     },
     "require-dev": {
-        "phpunit/phpunit": "^8.0",
-        "friendsofphp/php-cs-fixer": "^3.2"
+        "phpunit/phpunit": "^10.0"
     }
 }
