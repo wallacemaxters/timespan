@@ -2,6 +2,14 @@
 
 This is a library to work only with time durations in PHP.
 
+## Instalation
+
+```bash
+composer require wallacemaxters/timespan
+```
+
+## How to work
+
 With it you can work with the time very simply:
 
 
