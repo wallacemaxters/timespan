@@ -51,7 +51,7 @@ class Parser
      * @param Timespan $time
      * @return array
      */
-    public static function replacementsFromTimestamp(Timespan $time): array
+    public static function replacementsFromTimespan(Timespan $time): array
     {
         $units      = $time->getUnits();
         $isNegative = $time->isNegative();
@@ -116,9 +116,7 @@ class Parser
     }
 
     /**
-     * 
-     * @param string $format
-     * @return string
+     * Creates a regex used interally to extract time duration from a string format
      */
     protected static function createRegexFromFormat(string $format): string
     {

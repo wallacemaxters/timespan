@@ -128,7 +128,7 @@ class Timespan implements JsonSerializable, Stringable
      */
     public function format(string $format = self::DEFAULT_FORMAT): string
     {
-        return strtr($format, Parser::replacementsFromTimestamp($this));
+        return strtr($format, Parser::replacementsFromTimespan($this));
     }
 
     /**
@@ -224,7 +224,7 @@ class Timespan implements JsonSerializable, Stringable
     {
         return Parser::createTimespanFromFormat($format, $value);
     }
-    
+
     /**
      * Creates Timespan from  a diff of DateTimes
      */
