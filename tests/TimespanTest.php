@@ -2,6 +2,7 @@
 
 use WallaceMaxters\Timespan\Timespan;
 use PHPUnit\Framework\TestCase;
+use WallaceMaxters\Timespan\Exceptions\InvalidFormatException;
 use WallaceMaxters\Timespan\Parser;
 
 class TimespanTest extends TestCase
@@ -176,6 +177,7 @@ class TimespanTest extends TestCase
             15   => ['%R%s seconds', '+15 seconds'],
             -15  => ['%R%s seconds', '-15 seconds'],
         ] as $expected => $args) {
+
             $this->assertEquals(
                 $expected,
                 Timespan::createFromFormat(...$args)->seconds
@@ -185,8 +187,9 @@ class TimespanTest extends TestCase
 
         try {
             Timespan::createFromFormat('invalid', '00:00:04');
+            $this->assertTrue(false);
         } catch (\Throwable $th) {
-            $this->assertInstanceOf(InvalidArgumentException::class, $th);
+            $this->assertInstanceOf(InvalidFormatException::class, $th);
         }
     }
 
