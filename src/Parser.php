@@ -2,6 +2,8 @@
 
 namespace WallaceMaxters\Timespan;
 
+use WallaceMaxters\Timespan\Exceptions\InvalidFormatException;
+
 /**
  * @author Wallace de Souza Vizerra <wallacemaxters@gmail.com>
 */
@@ -78,10 +80,7 @@ class Parser
     public static function createUnitsFromFormat(string $format, string $value): array
     {
         if (! preg_match(static::createRegexFromFormat($format), $value, $units)) {
-            throw new \InvalidArgumentException(sprintf(
-                'Invalid string format for "%s"',
-                $value
-            ));
+            throw new InvalidFormatException($value, $format);
         }
 
         return $units + [
