@@ -17,7 +17,7 @@ class Timespan implements JsonSerializable, Stringable
     public const DEFAULT_FORMAT        = '%r%h:%i:%s';
     public const TIME_WITH_SIGN_FORMAT = '%R%h:%i:%s';
 
-    public float $seconds;
+    public float $seconds = 0;
 
     public function __construct(float $hours = 0, float $minutes = 0, float $seconds = 0)
     {
@@ -144,7 +144,7 @@ class Timespan implements JsonSerializable, Stringable
      *
      * @return string
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): string
     {
         return $this->format();
     }
