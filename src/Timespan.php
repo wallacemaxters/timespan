@@ -44,56 +44,29 @@ class Timespan implements JsonSerializable, Stringable
         return $this;
     }
 
-    /**
-     * Set minutes
-     *
-     * @param integer $minutes
-     * @return self
-     */
     public function setMinutes(float $minutes): static
     {
         return $this->setTime(0, $minutes, 0);
     }
 
-    /**
-     * Add hours
-     *
-     * @param integer $hours
-     * @return self
-     */
+
     public function setHours(float $hours): static
     {
         return $this->setTime($hours, 0, 0);
     }
 
-    /**
-     * Add seconds
-     *
-     * @param integer $seconds
-     * @return self
-     */
     public function addSeconds(float $seconds): static
     {
-        return $this->setTime(0, 0, $this->seconds + $seconds);
+        $this->seconds += $seconds;
+        
+        return $this;
     }
 
-    /**
-     * Add minutes
-     *
-     * @param integer $minutes
-     * @return self
-     */
     public function addMinutes(float $minutes): static
     {
         return $this->setTime(0, $minutes, $this->seconds);
     }
 
-    /**
-     * Add hours
-     *
-     * @param integer $hours
-     * @return self
-     */
     public function addHours(float $hours): static
     {
         return $this->setTime($hours, 0, $this->seconds);
